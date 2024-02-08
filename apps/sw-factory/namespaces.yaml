@@ -7,3 +7,13 @@ metadata:
 spec:
   finalizers:
     - kubernetes
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: vault
+  labels:
+    argocd.argoproj.io/managed-by: openshift-gitops
+spec:
+  finalizers:
+    - kubernetes

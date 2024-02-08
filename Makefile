@@ -19,7 +19,7 @@ install-quay-operator:
 bootstrap:
 	oc apply -f apps/bootstrap/
 	ansible-playbook -i inventory/ playbooks/bootstrap.yml
-
+	
 .PHONY: cleanup
 cleanup:
 	oc delete application vault -n openshift-gitops --ignore-not-found=true

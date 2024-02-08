@@ -3,5 +3,5 @@
 
   roles:
     - role: ../roles/install_vault
-    - role: ../roles/install_secrets_operator
-    - role: ../roles/install_quay
+    #- role: ../roles/install_secrets_operator
+    #- role: ../roles/install_quay
