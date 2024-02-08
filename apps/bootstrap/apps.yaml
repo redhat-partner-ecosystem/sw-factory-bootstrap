@@ -22,10 +22,10 @@ metadata:
 spec:
   project: sw-factory
   revisionHistoryLimit: 3
-  #syncPolicy:
-  #  automated:
-  #    prune: true
-  #    selfHeal: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
   source:
     directory:
       recurse: false

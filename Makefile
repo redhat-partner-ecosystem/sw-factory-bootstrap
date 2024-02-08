@@ -1,5 +1,5 @@
 VERSION = 1.0.0
-NAMESPACE = sw-factory
+NAME = sw-factory
 
 .PHONY: install-operators
 install-operators: install-gitops-operators install-quay-operator
@@ -15,11 +15,12 @@ install-quay-operator:
 	oc apply -f operators/openshift-quay-operator.yaml
 	oc apply -f operators/openshift-quay-security-operator.yaml
 
-
 .PHONY: bootstrap
 bootstrap:
 	oc apply -f apps/bootstrap/
+	ansible-playbook -i inventory/ playbooks/bootstrap.yml
 
 .PHONY: cleanup
 cleanup:
-	oc delete application sw-factory-infra -n openshift-gitops --ignore-not-found=true
+	oc delete application sw-factory -n openshift-gitops --ignore-not-found=true
+	oc delete project sw-factory
