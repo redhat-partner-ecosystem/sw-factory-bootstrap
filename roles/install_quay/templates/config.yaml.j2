@@ -1,0 +1,8 @@
+REGISTRY_TITLE: {{ quay_display_name }}
+SERVER_HOSTNAME: {{ _quay_registry_route }}
+EXTERNAL_TLS_TERMINATION: true
+{% if default_user | bool %}
+SUPER_USERS:
+- {{ ocp4_workload_quay_operator_registry_admin_user }}
+FEATURE_USER_INITIALIZE: true
+{% endif %}

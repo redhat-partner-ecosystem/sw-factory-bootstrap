@@ -10,6 +10,10 @@ spec:
   destinations:
     - namespace: sw-factory
       server: "*"
+    - namespace: vault
+      server: "*"
+    - namespace: external-secrets
+      server: "*"
   sourceRepos:
     - "*"
 status: {}

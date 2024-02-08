@@ -1,0 +1,102 @@
+# Quay needs OpenShift Container Storage (Noobaa in particular)
+# Check that the correct storage class exists on the cluster
+- name: Retrieve Bucket Class
+  k8s_info:
+    api_version: noobaa.io/v1alpha1
+    kind: BucketClass
+    namespace: openshift-storage
+  register: r_bucket_class
+
+- name: Assert that there is a Bucket Storage Class
+  assert:
+    that:
+      - r_bucket_class.resources | length == 1
+    fail_msg: Quay must be installed on a cluster with OpenShift Container Storage configured - and a Bucket Class deployed.
+
+- name: Determine Cluster Base Domain for Quay Route
+  k8s_info:
+    api_version: config.openshift.io/v1
+    kind: Ingress
+    name: cluster
+  register: r_ingress_config
+  failed_when: r_ingress_config.resources | length < 1
+
+- name: Use Provided Quay route hostname
+  when: quay_registry_route | default("") | length > 0
+  set_fact:
+    _quay_registry_route: "{{ quay_registry_route }}"
+
+- name: Otherwise use quay.basedomain for the Quay route hostname
+  when: quay_registry_route | default("") | length == 0
+  set_fact:
+    _quay_registry_route: "quay.{{ r_ingress_config.resources[0].spec.domain }}"
+
+- name: Create Quay Registry Resources
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+    - quay_namespace.yaml.j2
+    - config_bundle_secret.yaml.j2
+    - quay_registry.yaml.j2
+
+- name: Wait for Quay Registry to be available
+  k8s_info:
+    api_version: quay.redhat.com/v1
+    kind: QuayRegistry
+    name: "{{ quay_registry_name }}"
+    namespace: "{{ namespace_quay }}"
+  register: r_quay_registry
+  until:
+    - r_quay_registry.resources[0].status.currentVersion is defined
+    - r_quay_registry.resources[0].status.currentVersion | length > 0
+  retries: 120
+  delay: 10
+
+- name: Wait for API to be available
+  uri:
+    url: "{{ r_quay_registry.resources[0].status.registryEndpoint }}/api/v1/discovery"
+    method: GET
+    validate_certs: false
+  register: r_quayapi
+  until: r_quayapi.status == 200 or r_quayapi.status == 403
+  retries: 120
+  delay: 10
+
+- name: Set provided admin password
+  set_fact:
+    _ocp4_workload_quay_operator_registry_admin_password: >-
+      {{ default_user_pwd }}
+
+- name: Create user
+  uri:
+    url: "{{ r_quay_registry.resources[0].status.registryEndpoint }}/api/v1/user/initialize"
+    method: POST
+    body:
+      username: "{{ default_user }}"
+      password: "{{ default_user_pwd }}"
+      email: "quayadmin@opentlc.com"
+      access_token: "true"
+    body_format: json
+    validate_certs: false
+    status_code: 200
+  register: r_quayadmin
+
+- name: Save access_token
+  when: r_quayadmin.status == 200
+  set_fact:
+    _quay_registry_admin_token: "{{ r_quayadmin.json.access_token }}"
+
+- name: Create quay admin token secret
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'quay-admin-token-secret.yml.j2' ) | from_yaml }}"
+
+- name: Print info
+  debug:
+    msg: "{{ item }}"
+  loop:
+    - ""
+    - "A Quay Super User '{{ default_user }}' has been created."
+    - "The super user password is {{ default_user_pwd }}"
+    - "The token for the super user is {{ _quay_registry_admin_token }}"
