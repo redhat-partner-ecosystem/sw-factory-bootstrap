@@ -1,10 +1,6 @@
 VERSION = 1.0.0
 NAMESPACE = sw-factory
 
-.PHONY: namespace
-namespace:
-	oc new-project ${NAMESPACE}
-
 .PHONY: install-operators
 install-operators: install-gitops-operators install-quay-operator
 
@@ -22,8 +18,8 @@ install-quay-operator:
 
 .PHONY: bootstrap
 bootstrap:
-	oc apply -f apps/sw-factory/
+	oc apply -f apps/bootstrap/
 
 .PHONY: cleanup
 cleanup:
-	oc delete application campaign-manager-backend-dev -n openshift-gitops --ignore-not-found=true
+	oc delete application sw-factory-infra -n openshift-gitops --ignore-not-found=true

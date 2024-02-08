@@ -8,7 +8,7 @@ spec:
     - group: "*"
       kind: "*"
   destinations:
-    - namespace: sw-factory-infra
+    - namespace: sw-factory
       server: "*"
   sourceRepos:
     - "*"
@@ -17,7 +17,7 @@ status: {}
 kind: Application
 apiVersion: argoproj.io/v1alpha1
 metadata:
-  name: sw-factory-infra
+  name: sw-factory
   namespace: openshift-gitops
 spec:
   project: sw-factory
@@ -29,9 +29,9 @@ spec:
   source:
     directory:
       recurse: false
-    path: apps/sw-factory-infra
+    path: apps/sw-factory
     repoURL: https://github.com/redhat-partner-ecosystem/sw-factory-bootstrap
     targetRevision: main
   destination:
-    namespace: sw-factory-infra
+    namespace: sw-factory
     server: https://kubernetes.default.svc
