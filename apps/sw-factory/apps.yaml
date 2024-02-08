@@ -1,0 +1,37 @@
+kind: AppProject
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: sw-factory
+  namespace: openshift-gitops
+spec:
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  destinations:
+    - namespace: sw-factory-infra
+      server: "*"
+  sourceRepos:
+    - "*"
+status: {}
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: sw-factory-infra
+  namespace: openshift-gitops
+spec:
+  project: sw-factory
+  revisionHistoryLimit: 3
+  #syncPolicy:
+  #  automated:
+  #    prune: true
+  #    selfHeal: true
+  source:
+    directory:
+      recurse: false
+    path: apps/sw-factory-infra
+    repoURL: https://github.com/redhat-partner-ecosystem/sw-factory-bootstrap
+    targetRevision: main
+  destination:
+    namespace: sw-factory-infra
+    server: https://kubernetes.default.svc
