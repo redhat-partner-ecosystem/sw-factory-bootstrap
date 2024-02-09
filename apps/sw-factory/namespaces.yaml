@@ -27,3 +27,23 @@ metadata:
 spec:
   finalizers:
     - kubernetes
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: vault-config-operator
+  labels:
+    argocd.argoproj.io/managed-by: openshift-gitops
+spec:
+  finalizers:
+    - kubernetes
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: external-secrets
+  labels:
+    argocd.argoproj.io/managed-by: openshift-gitops
+spec:
+  finalizers:
+    - kubernetes
