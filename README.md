@@ -4,6 +4,35 @@ Install and configure the Software Factory Infrastructure
 
 ## TL;DR
 
+### Install the operators
+
+Subscribe to the operators:
+
+```shell
+make install-operators
+```
+
+Verify that the default GitOps instance is up-and-running:
+
+```shell
+oc get pods -n openshift-gitops
+```
+
+### Install the apps
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Install the Gitops/Pipeline operators
 
 Get the Red Hat GitOps routes:

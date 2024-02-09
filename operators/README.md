@@ -5,8 +5,7 @@
 Subscribe to the operators:
 
 ```shell
-oc apply -f operators/openshift-gitops-operator.yaml
-oc apply -f operators/openshift-pipeline-operator.yaml
+make install-operators
 ```
 
 Verify that the default GitOps instance is up-and-running:

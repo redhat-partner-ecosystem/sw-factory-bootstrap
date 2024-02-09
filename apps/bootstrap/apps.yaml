@@ -10,6 +10,8 @@ spec:
   destinations:
     - namespace: sw-factory
       server: "*"
+    - namespace: quay
+      server: "*"
     - namespace: vault
       server: "*"
     - namespace: external-secrets
@@ -35,7 +37,7 @@ spec:
       recurse: false
     path: apps/sw-factory
     repoURL: https://github.com/redhat-partner-ecosystem/sw-factory-bootstrap
-    targetRevision: main
+    targetRevision: develop
   destination:
     namespace: sw-factory
     server: https://kubernetes.default.svc
