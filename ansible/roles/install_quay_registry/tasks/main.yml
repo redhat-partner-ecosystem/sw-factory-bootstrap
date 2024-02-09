@@ -1,5 +1,5 @@
 
-- name: Install Quay Registry app
+- name: Create Quay application
   shell: >-
     oc create secret generic -n "{{ namespace_quay }}" --from-file config.yaml=../../apps/quay/config.yaml quay-init-config-bundle
     

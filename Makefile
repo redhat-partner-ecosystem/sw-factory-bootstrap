@@ -18,5 +18,5 @@ install-quay-operator:
 .PHONY: bootstrap
 bootstrap:
 	oc apply -f apps/bootstrap/apps.yaml
-	ansible-playbook -i ansible/inventory/ ansible/playbooks/quay.yml
+	ansible-playbook -i ansible/inventory/ ansible/playbooks/bootstrap.yml
 	

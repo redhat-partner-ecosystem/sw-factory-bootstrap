@@ -5,7 +5,7 @@ all:
 
     # utility services
     namespace_quay: quay
-    #namespace_vault: vault
+    namespace_vault: vault
     #namespace_secrets_manager: external-secrets
     #namespace_devspace: devspaces
     
