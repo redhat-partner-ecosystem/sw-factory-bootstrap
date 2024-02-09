@@ -44,7 +44,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: vault-config-gitops-cluster-admin
-  namespace: vault-config
+  namespace: vault-config-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
