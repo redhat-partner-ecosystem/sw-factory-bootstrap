@@ -2,7 +2,7 @@ apiVersion: quay.redhat.com/v1
 kind: QuayRegistry
 metadata:
   name: quay-registry
-  namespace: openshift-operators
+  namespace: quay
 spec:
   configBundleSecret: quay-init-config-bundle
   components:

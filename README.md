@@ -18,7 +18,25 @@ Verify that the default GitOps instance is up-and-running:
 oc get pods -n openshift-gitops
 ```
 
-### Install the apps
+### Access Red Hat GitOps
+
+Get the Red Hat GitOps routes:
+
+```shell
+oc get route openshift-gitops-server -n openshift-gitops
+```
+
+Extract the Red Hat GitOps admin password:
+
+```shell
+oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=-
+```
+
+**Note:** Login with `Username` and `Password` abd not with SSO ! 
+
+
+
+
 
 
 
@@ -35,17 +53,7 @@ oc get pods -n openshift-gitops
 
 ### Install the Gitops/Pipeline operators
 
-Get the Red Hat GitOps routes:
 
-```shell
-oc get route openshift-gitops-server -n openshift-gitops
-```
-
-Extract the Red Hat GitOps admin password:
-
-```shell
-oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=-
-```
 
 
 ### Create the Quay admin user

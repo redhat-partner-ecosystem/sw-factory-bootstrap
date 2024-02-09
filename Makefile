@@ -11,7 +11,7 @@ install-gitops-operators:
 
 .PHONY: install-quay-operator
 install-quay-operator:
-	oc create secret generic -n openshift-operators --from-file config.yaml=./operators/quay/config.yaml quay-init-config-bundle
+	oc create secret generic -n openshift-operators --from-file config.yaml=./apps/quay/config.yaml quay-init-config-bundle
 	oc apply -f operators/openshift-quay-operator.yaml
 	oc apply -f operators/openshift-quay-security-operator.yaml
 

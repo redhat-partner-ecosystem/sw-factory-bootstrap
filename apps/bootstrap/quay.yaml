@@ -1,0 +1,21 @@
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: quay
+  namespace: openshift-gitops
+spec:
+  project: sw-factory
+  revisionHistoryLimit: 3
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  source:
+    directory:
+      recurse: false
+    path: apps/quay
+    repoURL: https://github.com/redhat-partner-ecosystem/sw-factory-bootstrap
+    targetRevision: develop
+  destination:
+    namespace: quay
+    server: https://kubernetes.default.svc
