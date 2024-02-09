@@ -1,0 +1,7 @@
+- name: Configure the Quay container registry
+  hosts: localhost
+
+  roles:
+    - role: ../roles/env
+    #- role: ../roles/quay_registry
+    - role: ../roles/quay_bridge

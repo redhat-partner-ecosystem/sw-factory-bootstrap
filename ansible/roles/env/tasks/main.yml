@@ -1,0 +1,30 @@
+# Quay needs OpenShift Container Storage (Noobaa in particular)
+# Check that the correct storage class exists on the cluster
+- name: Retrieve bucket class
+  k8s_info:
+    api_version: noobaa.io/v1alpha1
+    kind: BucketClass
+    namespace: openshift-storage
+  register: r_bucket_class
+
+- name: Assert that there is a Bucket Storage Class
+  assert:
+    that:
+      - r_bucket_class.resources | length == 1
+    fail_msg: Quay must be installed on a cluster with OpenShift Container Storage configured - and a Bucket Class deployed.
+
+- name: Determine cluster base domain
+  k8s_info:
+    api_version: config.openshift.io/v1
+    kind: Ingress
+    name: cluster
+  register: r_ingress_config
+  failed_when: r_ingress_config.resources | length < 1
+
+- name: Register cluster base domain
+  set_fact:
+    cluster_domain: "{{ r_ingress_config.resources[0].spec.domain }}"
+
+#- name: DEBUG
+#  debug:
+#    msg: "{{ cluster_domain }}"

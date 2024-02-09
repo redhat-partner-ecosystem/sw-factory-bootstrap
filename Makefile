@@ -17,13 +17,6 @@ install-quay-operator:
 
 .PHONY: bootstrap
 bootstrap:
-	oc apply -f apps/bootstrap/
+	oc apply -f apps/bootstrap/apps.yaml
+	ansible-playbook -i ansible/inventory/ ansible/playbooks/quay.yml
 	
-	
-.PHONY: cleanup
-cleanup:
-	oc delete application vault -n openshift-gitops --ignore-not-found=true
-	oc delete application sw-factory -n openshift-gitops --ignore-not-found=true
-	oc delete project vault
-	oc delete project quay
-	oc delete project sw-factory

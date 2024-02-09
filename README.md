@@ -18,13 +18,13 @@ Verify that the default GitOps instance is up-and-running:
 oc get pods -n openshift-gitops
 ```
 
-### Access Red Hat GitOps
-
-Get the Red Hat GitOps routes:
+### Bootstrap the default Software Factory apps
 
 ```shell
-oc get route openshift-gitops-server -n openshift-gitops
+make bootstrap
 ```
+
+### Access Red Hat GitOps
 
 Extract the Red Hat GitOps admin password:
 
@@ -32,49 +32,14 @@ Extract the Red Hat GitOps admin password:
 oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=-
 ```
 
+Get the Red Hat GitOps routes:
+
+```shell
+oc get route openshift-gitops-server -n openshift-gitops
+```
+
 **Note:** Login with `Username` and `Password` abd not with SSO ! 
 
 
+### Access the Quay Container Registry
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Install the Gitops/Pipeline operators
-
-
-
-
-### Create the Quay admin user
-
-To create a default `admin` user, make a call to Quay's management API:
-
-```shell
-# get the quay api endpoint
-oc get route quay-quay -n quay
-```
-
-```shell
-# export the route URL
-export QUAY=quay-registry-.... 
-```
-
-```shell
-# create the user
-curl -X POST -k  "https://$QUAY/api/v1/user/initialize" \
-    --header 'Content-Type: application/json' \
-    --data '{ "username": "admin", "password":"admin321", "email": "admin@example.com", "access_token": true}'
-```
-
-**Important:** save the access token somewhere, it is never shown again !

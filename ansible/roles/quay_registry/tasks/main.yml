@@ -1,0 +1,61 @@
+
+- name: Install Quay Registry app
+  shell: >-
+    oc create secret generic -n "{{ namespace_quay }}" --from-file config.yaml=../../apps/quay/config.yaml quay-init-config-bundle
+    
+    oc apply -f ../../apps/bootstrap/quay.yaml
+
+- name: Wait for Quay Registry to be available
+  k8s_info:
+    api_version: quay.redhat.com/v1
+    kind: QuayRegistry
+    name: quay-registry
+    namespace: "{{ namespace_quay }}"
+  register: r_quay_registry
+  until:
+    - r_quay_registry.resources[0].status.currentVersion is defined
+    - r_quay_registry.resources[0].status.currentVersion | length > 0
+  retries: 120
+  delay: 10
+
+- name: Set Quay Registry route hostname
+  set_fact:
+    _quay_registry_route: "quay-registry-quay-quay.{{ cluster_domain }}"
+
+- name: Wait for API to be available
+  uri:
+    url: "https://{{ _quay_registry_route }}/api/v1/discovery"
+    method: GET
+    validate_certs: false
+  register: r_quayapi
+  until: r_quayapi.status == 200 or r_quayapi.status == 403
+  retries: 120
+  delay: 10
+
+- name: Create the admin user
+  uri:
+    url: "https://{{ _quay_registry_route }}/api/v1/user/initialize"
+    method: POST
+    body:
+      username: "{{ default_user }}"
+      password: "{{ default_user_pwd }}"
+      email: "{{ default_user_email }}"
+      access_token: "true"
+    body_format: json
+    validate_certs: false
+    status_code: 200
+  register: r_quayadmin
+
+- name: Save the admin access_token
+  when: r_quayadmin.status == 200
+  set_fact:
+    _quay_registry_admin_token: "{{ r_quayadmin.json.access_token }}"
+
+- name: Create Quay registry admin token secret
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'quay-admin-token-secret.yml.j2' ) | from_yaml }}"
+
+#- name: DEBUG
+#  debug:
+#    msg: "The token for the admin user is {{ _quay_registry_admin_token }}"

@@ -1,20 +1,4 @@
-# Installation
 
-## Install the GitOps operators
-
-Subscribe to the operators:
-
-```shell
-make install-operators
-```
-
-Verify that the default GitOps instance is up-and-running:
-
-```shell
-oc get pods -n openshift-gitops
-```
-
-That's all ...
 
 ## Install Red Hat Quay
 
