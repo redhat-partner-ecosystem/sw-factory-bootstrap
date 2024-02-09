@@ -63,32 +63,27 @@
 
 - name: Enable kubernetes auth
   shell: |
-    export SA_SECRET_NAME=$(oc get secrets -n default --output=json \
-    | jq -r '.items[].metadata | select(.name|startswith("vault-auth-secret")).name')
-    export SA_JWT_TOKEN=$(oc get secret $SA_SECRET_NAME -n default \
-    --output 'go-template={{ "{{" }} .data.token {{ "}}" }}' | base64 --decode)
-    export SA_CA_CRT=$(oc config view --raw --minify --flatten \
-    --output 'jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode)
-    export K8S_HOST=$(oc config view --raw --minify --flatten \
-    --output 'jsonpath={.clusters[].cluster.server}')
+    export SA_SECRET_NAME=$(oc get secrets -n default --output=json | jq -r '.items[].metadata | select(.name|startswith("vault-auth-secret")).name')
+    export SA_JWT_TOKEN=$(oc get secret $SA_SECRET_NAME -n default --output 'go-template={{ "{{" }} .data.token {{ "}}" }}' | base64 --decode)
+    export SA_CA_CRT=$(oc config view --raw --minify --flatten --output 'jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode)
+    export K8S_HOST=$(oc config view --raw --minify --flatten --output 'jsonpath={.clusters[].cluster.server}')
+    
     oc exec vault-0 -n {{ namespace_vault }} -- vault auth enable kubernetes
-    oc exec vault-0 -n {{ namespace_vault }} -- vault write auth/kubernetes/config \
-    token_reviewer_jwt="$SA_JWT_TOKEN" \
-    kubernetes_host="$K8S_HOST" \
-    kubernetes_ca_cert="$SA_CA_CRT" \
-    issuer="https://kubernetes.default.svc.cluster.local"
+    oc exec vault-0 -n {{ namespace_vault }} -- vault write auth/kubernetes/config token_reviewer_jwt="$SA_JWT_TOKEN" \
+      kubernetes_host="$K8S_HOST" \
+      kubernetes_ca_cert="$SA_CA_CRT" issuer="https://kubernetes.default.svc.cluster.local"
 
 - name: Create role and service account authentication
   shell: |
     oc exec vault-0 -n {{ namespace_vault }} -- vault write auth/kubernetes/role/rhdh-role \
-    bound_service_account_names=vault-auth \
-    bound_service_account_namespaces=default \
-    token_policies=rhdh-policy \
-    ttl=160h
-    export SA_SECRET_NAME=$(oc get secrets -n default --output=json \
-    | jq -r '.items[].metadata | select(.name|startswith("vault-auth-secret")).name')
-    export SA_JWT_TOKEN=$(oc get secret $SA_SECRET_NAME -n default \
-    --output 'go-template={{ "{{" }} .data.token {{ "}}" }}' | base64 --decode)
+      bound_service_account_names=vault-auth \
+      bound_service_account_namespaces=default \
+      token_policies=rhdh-policy \
+      ttl=160h
+    
+    export SA_SECRET_NAME=$(oc get secrets -n default --output=json | jq -r '.items[].metadata | select(.name|startswith("vault-auth-secret")).name')
+    export SA_JWT_TOKEN=$(oc get secret $SA_SECRET_NAME -n default --output 'go-template={{ "{{" }} .data.token {{ "}}" }}' | base64 --decode)
+    
     oc exec vault-0 -n vault -- vault write auth/kubernetes/login role=rhdh-role jwt=$SA_JWT_TOKEN
 
 - name: Enable kv version 2
